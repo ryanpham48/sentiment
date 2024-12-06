@@ -92,11 +92,7 @@ def process_text(
     text, 
     emoji_dict, 
     teencode_dict, 
-    wrong_words, 
-    positive_words, 
-    neutral_words, 
-    negative_words
-):
+    wrong_words):
     """
     Process text by handling emojis, teen code, and removing unwanted characters.
     Preserve specific words in positive, neutral, and negative word lists.

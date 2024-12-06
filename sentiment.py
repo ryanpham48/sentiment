@@ -146,22 +146,6 @@ def process_special_word(text):
         new_text = text
     return new_text.strip()
 
-# Hàm xử lý POS tagging và lọc từ loại
-def process_postag_thesea(text):
-    new_document = ''
-    for sentence in sent_tokenize(text):
-        sentence = sentence.replace('.', '')
-        ###### POS tag
-        lst_word_type = ['N','Np','A','AB','V','R'] # Giới hạn từ loại cần thiết
-        sentence = ' '.join(
-            word[0] if word[1].upper() in lst_word_type else '' 
-            for word in pos_tag(process_special_word(word_tokenize(sentence, format="text")))
-        )
-        new_document = new_document + sentence + ' '
-    ###### Loại bỏ khoảng trắng thừa
-    new_document = regex.sub(r'\s+', ' ', new_document).strip()
-    return new_document
-
 # Hàm loại bỏ từ dừng
 def remove_stopwords(text):
     words = text.split()

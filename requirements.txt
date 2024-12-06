@@ -8,3 +8,6 @@ re
 regex
 time
 SMOTE
+underthesea
+joblib
+wordcloud

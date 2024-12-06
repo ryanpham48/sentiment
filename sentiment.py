@@ -33,11 +33,11 @@ valid_reviews = load_data()
 model, count_vectorizer = load_model_and_vectorizer()
 
 # Load files
-emoji_file = '/Users/anhvupham/Downloads/files/emojicon.txt'
-teencode_file = '/Users/anhvupham/Downloads/files/teencode.txt'
-english_file = '/Users/anhvupham/Downloads/files/english-vnmese.txt'
-wrong_word_file = '/Users/anhvupham/Downloads/files/wrong-word.txt'
-stopwords_file = '/Users/anhvupham/Downloads/files/vietnamese-stopwords.txt'
+emoji_file = 'emojicon.txt'
+teencode_file = 'teencode.txt'
+english_file = 'english-vnmese.txt'
+wrong_word_file = 'wrong-word.txt'
+stopwords_file = 'vietnamese-stopwords.txt'
 
 # Đọc dữ liệu từ các file
 with open(emoji_file, 'r', encoding="utf8") as file:

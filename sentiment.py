@@ -60,39 +60,6 @@ with open(stopwords_file, 'r', encoding="utf8") as file:
 import re
 import regex 
 from underthesea import word_tokenize, pos_tag, sent_tokenize
-
-positive_words = [
-    "thích", "tốt", "xuất sắc", "tuyệt vời", "ổn",
-    "hài lòng", "ưng ý", "hoàn hảo", "chất lượng", "nhanh",
-    "tiện lợi", "dễ sử dụng", "hiệu quả", "ấn tượng",
-    "nổi bật", "thân thiện",
-    "cao cấp", "độc đáo", "rất tốt", "rất thích", "tận tâm", "đáng tin cậy", "đẳng cấp",
-    "hấp dẫn", "an tâm", "thúc đẩy", "cảm động", "phục vụ tốt", "làm hài lòng", "gây ấn tượng", "nổi trội",
-    "sáng tạo", "phù hợp", "tận tâm", "hiếm có", "cải thiện", "hoà nhã", "chăm chỉ", "cẩn thận",
-    "vui vẻ", "sáng sủa", "hào hứng", "đam mê", "vừa vặn", "đáng tiền"
-]
-neutral_words = [
-    "bình thường", "tạm được", "chấp nhận được", "vừa phải", "không_tệ",
-    "được", "ổn định", "vừa vặn", "trung tính", "bình ổn",
-    "khá tốt", "khá ổn", "hài hòa", "bình dị", "đơn giản",
-    "không có gì đặc biệt", "không_nổi_bật", "không_quá_tốt", "không_xấu",
-    "trung hòa", "không_vấn_đề", "không có ý kiến", "không khác biệt",
-    "hợp lý", "thường", "đáng cân nhắc", "khá ổn định", "không_đáng_kể",
-    "tạm ổn", "trung bình", "vừa đủ", "không_xuất_sắc", "không nổi trội",
-    "vừa sức", "đều đều", "không đáng chú ý", "thường ngày", "thường xuyên",
-    "không_quá_xấu", "không_quá_tốt"
-]
-negative_words = [
-    "kém", "tệ", "buồn", "chán", "không dễ chịu", "không chất lượng"
-    "kém chất lượng", "không thích", "không ổn",
-    "không hợp", "không đáng tin cậy", "không chuyên nghiệp",
-    "không phản hồi", "không an toàn", "không phù hợp", "không thân thiện", "không linh hoạt", "không đáng giá",
-    "không ấn tượng", "không tốt", "chậm", "khó khăn", "phức tạp",
-    "khó chịu", "gây khó dễ", "rườm rà", "thất bại", "tồi tệ", "khó xử", "không thể chấp nhận", "tồi tệ","không rõ ràng",
-    "không chắc chắn", "rối rắm", "không tiện lợi", "không đáng tiền",
-    'không hài lòng', 'không đáng', 'quá tệ', 'rất tệ',
-    'thất vọng', 'chán', 'tệ hại', 'kinh khủng', 'không ưng ý'
-]
 # Chuẩn hóa unicode tiếng việt
 def loaddicchar():
     uniChars = "àáảãạâầấẩẫậăằắẳẵặèéẻẽẹêềếểễệđìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵÀÁẢÃẠÂẦẤẨẪẬĂẰẮẲẴẶÈÉẺẼẸÊỀẾỂỄỆĐÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴÂĂĐÔƠƯ"
@@ -195,7 +162,7 @@ def process_postag_thesea(text):
     for sentence in sent_tokenize(text):
         sentence = sentence.replace('.', '')
         ###### POS tag
-        lst_word_type = ['N','Np','A','AB','V','VB','VY','R']
+        lst_word_type = ['N','Np','A','AB','V','R'] # Giới hạn từ loại cần thiết
         sentence = ' '.join(
             word[0] if word[1].upper() in lst_word_type else '' 
             for word in pos_tag(process_special_word(word_tokenize(sentence, format="text")))
@@ -212,11 +179,11 @@ def remove_stopwords(text):
     return " ".join(words)
 
 # Hàm tổng hợp tiền xử lý đầy đủ bao gồm POS Tagging
-def clean_text(text, emoji_dict, teencode_dict, wrong_words, positive_words, neutral_words, negative_words):
+def clean_text(text, emoji_dict, teencode_dict, wrong_words):
     text = normalize_repeated_characters(text)  # Chuẩn hóa ký tự lặp
     text = covert_unicode(text)
     text = remove_emoji_punctuation(text)
-    text = process_text(text, emoji_dict, teencode_dict, wrong_words, positive_words, neutral_words, negative_words)  # Làm sạch
+    text = process_text(text, emoji_dict, teencode_dict, wrong_words)  # Làm sạch
     text = process_special_word(text)  # Xử lý từ đặc biệt
     text = process_postag_thesea(text)  # POS tagging và lọc từ loại
     text = remove_stopwords(text)  # Loại bỏ từ dừng
@@ -229,7 +196,7 @@ def predict_sentiment(text, model, vectorizer):
     """
     try:
         # Xử lý văn bản
-        processed_text = clean_text(text, emoji_dict, teencode_dict, wrong_words, positive_words, neutral_words, negative_words)
+        processed_text = clean_text(text, emoji_dict, teencode_dict, wrong_words)
 
         # Vector hóa văn bản
         vectorized_text = vectorizer.transform([processed_text])
@@ -337,7 +304,7 @@ elif menu == 'Dự đoán từ văn bản':
                 try:
                     # Tiền xử lý văn bản
                     processed_text = clean_text(
-                        input_text, emoji_dict, teencode_dict, wrong_words, positive_words, neutral_words, negative_words)
+                        input_text, emoji_dict, teencode_dict, wrong_words)
 
                     # Hiển thị văn bản sau khi tiền xử lý
                     st.write("**Văn bản sau khi tiền xử lý:**")
@@ -385,7 +352,7 @@ elif menu == 'Dự đoán từ văn bản':
                 else:
                     # Tiền xử lý văn bản
                     data["processed_text"] = data["noi_dung_binh_luan"].apply(
-                        lambda x: clean_text(x, emoji_dict, teencode_dict, wrong_words, positive_words, neutral_words, negative_words)
+                        lambda x: clean_text(x, emoji_dict, teencode_dict, wrong_words)
                         if isinstance(x, str)
                         else None
                     )

@@ -115,7 +115,6 @@ def process_text(
         
         # Step 4: Remove wrong words
         sentence = ' '.join('' if word in wrong_words else word for word in sentence.split())
-        )
         
         new_sentence += sentence + '. '  # Recombine sentences
     

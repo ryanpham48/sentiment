@@ -118,8 +118,8 @@ def process_text(
         
         new_sentence += sentence + '. '  # Recombine sentences
     
-    # Step 6: Remove excess whitespace
-    document = regex.sub(r'\s+', ' ', new_sentence).strip()  
+        # Step 5: Remove excess whitespace
+        document = regex.sub(r'\s+', ' ', new_sentence).strip()  
     return document
 
 # Hàm xử lý từ đặc biệt
@@ -146,6 +146,20 @@ def process_special_word(text):
         new_text = text
     return new_text.strip()
 
+# Hàm xử lý POS tagging và lọc từ loại
+def process_postag_thesea(text):
+    new_document = ''
+    for sentence in sent_tokenize(text):
+        sentence = sentence.replace('.','')
+        ###### POS tag
+        lst_word_type = ['N','Np','A','AB','V','R'] # Giới hạn từ loại cần thiết
+        # lst_word_type = ['A','AB','V','VB','VY','R']
+        sentence = ' '.join( word[0] if word[1].upper() in lst_word_type else '' for word in pos_tag(process_special_word(word_tokenize(sentence, format="text"))))
+        new_document = new_document + sentence + ' '
+    ###### DEL excess blank space
+    new_document = regex.sub(r'\s+', ' ', new_document).strip()
+    return new_document
+    
 # Hàm loại bỏ từ dừng
 def remove_stopwords(text):
     words = text.split()
@@ -159,6 +173,7 @@ def clean_text(text, emoji_dict, teencode_dict, wrong_words):
     text = remove_emoji_punctuation(text)
     text = process_text(text, emoji_dict, teencode_dict, wrong_words)  # Làm sạch
     text = process_special_word(text)  # Xử lý từ đặc biệt
+    text = process_postag_thesea(text)  # POS tagging và lọc từ loại
     text = remove_stopwords(text)  # Loại bỏ từ dừng
 
     return text

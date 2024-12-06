@@ -387,65 +387,108 @@ elif menu == 'Dự đoán từ văn bản':
 
 #----------------------------------------------------------------------------------------------------
 elif menu == 'Product ID Prediction':
-    st.subheader('Product ID Prediction')
-    st.write("Analyze customer sentiment for one or more product IDs.")
+    st.subheader('Dự đoán cảm xúc theo mã sản phẩm')
+    st.write("Phân tích cảm xúc của khách hàng cho một hoặc nhiều mã sản phẩm.")
 
-    choice = st.radio("Choose Input Method:", ["Nhập mã sản phẩm", "Tải lên tập CSV"])
+    choice = st.radio("Chọn phương thức nhập liệu:", ["Nhập mã sản phẩm", "Tải lên tập CSV"])
 
     if choice == "Nhập mã sản phẩm":
-        product_id = st.text_input("Enter Product ID:")
-    if st.button("Analyze Product"):
-        if product_id.strip():
-            try:
-                # Chuyển đổi product_id thành số nguyên
-                product_id = int(product_id.strip())
-                product_reviews = valid_reviews[valid_reviews['ma_san_pham'] == product_id]
-                if not product_reviews.empty:
-                    st.write(f"Analysis for Product ID: {product_id}")
-                    st.dataframe(product_reviews.head())
-                else:
-                    st.warning(f"No reviews found for Product ID: {product_id}")
-            except ValueError:
-                st.error("Product ID must be a valid integer!")
-        else:
-            st.warning("Please enter a valid Product ID.")
+        product_id = st.text_input("Nhập mã sản phẩm:")
+        if st.button("Phân tích sản phẩm"):
+            if product_id.strip():
+                try:
+                    # Chuyển đổi product_id thành số nguyên
+                    product_id = int(product_id.strip())
+                    product_reviews = valid_reviews[valid_reviews['ma_san_pham'] == product_id]
+                    
+                    if not product_reviews.empty:
+                        st.write(f"Phân tích cho mã sản phẩm: {product_id}")
+                        st.dataframe(product_reviews.head())
+                        
+                        # Phân tích đánh giá
+                        sentiment_counts = product_reviews['sentiment_rate'].value_counts()
+                        
+                        # Phân loại đánh giá
+                        positive_reviews = " ".join(product_reviews[product_reviews['sentiment_rate'] == 'positive']['noi_dung_binh_luan_clean'].dropna())
+                        neutral_reviews = " ".join(product_reviews[product_reviews['sentiment_rate'] == 'neutral']['noi_dung_binh_luan_clean'].dropna())
+                        negative_reviews = " ".join(product_reviews[product_reviews['sentiment_rate'] == 'negative']['noi_dung_binh_luan_clean'].dropna())
+
+                        # Vẽ WordCloud
+                        st.write('### WordCloud cho sản phẩm:')
+                        if positive_reviews:
+                            wc_pos = WordCloud(background_color='white', max_words=100).generate(positive_reviews)
+                            st.image(wc_pos.to_array(), caption="Positive Reviews WordCloud")
+                        if neutral_reviews:
+                            wc_neu = WordCloud(background_color='white', max_words=100).generate(neutral_reviews)
+                            st.image(wc_neu.to_array(), caption="Neutral Reviews WordCloud")
+                        if negative_reviews:
+                            wc_neg = WordCloud(background_color='white', max_words=100).generate(negative_reviews)
+                            st.image(wc_neg.to_array(), caption="Negative Reviews WordCloud")
+                        
+                        # Liệt kê top từ
+                        def get_top_keywords(text, top_n=10):
+                            words = text.split()
+                            word_counts = pd.Series(words).value_counts()
+                            return word_counts.head(top_n).to_dict()
+
+                        positive_keywords = get_top_keywords(positive_reviews)
+                        neutral_keywords = get_top_keywords(neutral_reviews)
+                        negative_keywords = get_top_keywords(negative_reviews)
+
+                        st.write("### Từ khóa phổ biến nhất:")
+                        st.write("Top từ tích cực:", positive_keywords)
+                        st.write("Top từ trung lập:", neutral_keywords)
+                        st.write("Top từ tiêu cực:", negative_keywords)
+
+                        # Hiển thị thông tin thống kê
+                        st.write("### Thống kê cảm xúc:")
+                        st.write({
+                            "Mã sản phẩm": product_id,
+                            "Tổng đánh giá tích cực": sentiment_counts.get('positive', 0),
+                            "Tổng đánh giá trung lập": sentiment_counts.get('neutral', 0),
+                            "Tổng đánh giá tiêu cực": sentiment_counts.get('negative', 0)
+                        })
+                    else:
+                        st.warning(f"Không tìm thấy đánh giá cho mã sản phẩm: {product_id}")
+                except ValueError:
+                    st.error("Mã sản phẩm phải là một số nguyên hợp lệ!")
+            else:
+                st.warning("Vui lòng nhập mã sản phẩm hợp lệ!")
 
     elif choice == "Tải lên tập CSV":
-        st.subheader("Upload a CSV File")
+        st.subheader("Tải lên tệp CSV")
 
-    # File uploader
-    uploaded_file = st.file_uploader("Choose a CSV file with 'product_id' column", type=["csv"])
+        # File uploader
+        uploaded_file = st.file_uploader("Chọn tệp CSV có cột 'product_id'", type=["csv"])
 
-    if uploaded_file is None:
-        # Nhắc nhở nhẹ nhàng
-        st.info("Please upload a CSV file to start the analysis.")
-    else:
-        # Chỉ xử lý khi đã có tệp được tải lên
-        try:
-            # Đọc file CSV
-            data = pd.read_csv(uploaded_file)
+        if uploaded_file is None:
+            st.info("Vui lòng tải lên tệp CSV để bắt đầu phân tích.")
+        else:
+            try:
+                # Đọc file CSV
+                data = pd.read_csv(uploaded_file)
 
-            # Kiểm tra cột 'product_id' có tồn tại
-            if "product_id" not in data.columns:
-                st.error("The CSV file must contain a 'product_id' column.")
-            else:
-                # Xử lý giá trị trong cột 'product_id'
-                data["product_id"] = pd.to_numeric(data["product_id"], errors="coerce")  # Chuyển đổi các giá trị hợp lệ
-                data = data.dropna(subset=["product_id"])  # Loại bỏ các hàng có giá trị NaN
-                data["product_id"] = data["product_id"].astype(int)  # Chuyển đổi thành số nguyên
-                
-                # Lấy danh sách product_id duy nhất
-                product_ids = data["product_id"].unique()
-                st.write(f"Found {len(product_ids)} Product IDs:")
-                st.write(product_ids)
+                # Kiểm tra cột 'product_id' có tồn tại
+                if "product_id" not in data.columns:
+                    st.error("Tệp CSV phải chứa cột 'product_id'.")
+                else:
+                    # Xử lý giá trị trong cột 'product_id'
+                    data["product_id"] = pd.to_numeric(data["product_id"], errors="coerce")  # Chuyển đổi các giá trị hợp lệ
+                    data = data.dropna(subset=["product_id"])  # Loại bỏ các hàng có giá trị NaN
+                    data["product_id"] = data["product_id"].astype(int)  # Chuyển đổi thành số nguyên
+                    
+                    # Lấy danh sách product_id duy nhất
+                    product_ids = data["product_id"].unique()
+                    st.write(f"Tìm thấy {len(product_ids)} mã sản phẩm:")
+                    st.write(product_ids)
 
-                # Phân tích từng product ID
-                for product_id in product_ids:
-                    st.subheader(f"Analysis for Product ID: {product_id}")
-                    product_reviews = valid_reviews[valid_reviews['ma_san_pham'] == product_id]
-                    if not product_reviews.empty:
-                        st.dataframe(product_reviews.head())
-                    else:
-                        st.warning(f"No reviews found for Product ID: {product_id}")
-        except Exception as e:
-            st.error(f"Error processing the file: {e}")
+                    # Phân tích từng product ID
+                    for product_id in product_ids:
+                        st.subheader(f"Phân tích cho mã sản phẩm: {product_id}")
+                        product_reviews = valid_reviews[valid_reviews['ma_san_pham'] == product_id]
+                        if not product_reviews.empty:
+                            st.dataframe(product_reviews.head())
+                        else:
+                            st.warning(f"Không tìm thấy đánh giá cho mã sản phẩm: {product_id}")
+            except Exception as e:
+                st.error(f"Lỗi khi xử lý tệp: {e}")

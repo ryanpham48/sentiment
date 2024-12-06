@@ -159,7 +159,6 @@ def clean_text(text, emoji_dict, teencode_dict, wrong_words):
     text = remove_emoji_punctuation(text)
     text = process_text(text, emoji_dict, teencode_dict, wrong_words)  # Làm sạch
     text = process_special_word(text)  # Xử lý từ đặc biệt
-    text = process_postag_thesea(text)  # POS tagging và lọc từ loại
     text = remove_stopwords(text)  # Loại bỏ từ dừng
 
     return text

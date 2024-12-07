@@ -492,30 +492,42 @@ elif menu == 'Product ID Prediction':
                     if not product_reviews.empty:
                         st.dataframe(product_reviews.head())
 
-                        # Tạo WordCloud cho từng loại cảm xúc
-                        sentiments = product_reviews['sentiment_rate'].unique()
+                        # Tổng số đánh giá
+                        total_reviews = len(product_reviews)
+                        st.write(f"Tổng số đánh giá: {total_reviews}")
+
+                        # Phân phối cảm xúc
+                        sentiment_counts = product_reviews['sentiment_rate'].value_counts()
+                        st.write("Phân phối cảm xúc:")
+                        st.bar_chart(sentiment_counts)
+
+                        # Tạo WordCloud và liệt kê từ khóa
+                        sentiments = ["positive", "neutral", "negative"]
                         sentiment_text = {
                             sentiment: " ".join(
                                 product_reviews[product_reviews['sentiment_rate'] == sentiment]['noi_dung_binh_luan_clean']
                             )
                             for sentiment in sentiments
                         }
-                        for sentiment, text in sentiment_text.items():
-                            wordcloud = WordCloud(background_color='white', max_words=100).generate(text)
-                            st.image(wordcloud.to_array(), caption=f"WordCloud - {sentiment}")
 
-                        # Lấy từ khóa chính
-                        top_keywords = {
-                            sentiment: pd.Series(text.split()).value_counts().head(10).to_dict()
-                            for sentiment, text in sentiment_text.items()
-                        }
+                        for sentiment, text in sentiment_text.items():
+                            if text.strip():  # Nếu có dữ liệu
+                                # Tạo WordCloud
+                                wordcloud = WordCloud(background_color='white', max_words=100).generate(text)
+                                st.image(wordcloud.to_array(), caption=f"WordCloud - {sentiment.capitalize()}")
+
+                                # Liệt kê từ khóa chính
+                                top_keywords = pd.Series(text.split()).value_counts().head(10)
+                                st.write(f"Top từ khóa ({sentiment.capitalize()}):")
+                                st.write(top_keywords)
 
                         # Lưu kết quả phân tích
                         analysis_results.append({
                             "Product ID": product_id,
-                            "Total Reviews": len(product_reviews),
-                            "Sentiments": sentiments.tolist(),
-                            "Top Keywords": top_keywords
+                            "Total Reviews": total_reviews,
+                            "Positive Reviews": sentiment_counts.get("positive", 0),
+                            "Neutral Reviews": sentiment_counts.get("neutral", 0),
+                            "Negative Reviews": sentiment_counts.get("negative", 0),
                         })
                     else:
                         st.warning(f"Không tìm thấy đánh giá cho mã sản phẩm: {product_id}")

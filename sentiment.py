@@ -506,6 +506,8 @@ elif menu == 'Product ID Prediction':
                             sentiment_text = {
                                 sentiment: " ".join(
                                     product_reviews[product_reviews['sentiment_rate'] == sentiment]['noi_dung_binh_luan_clean']
+                                    .dropna()
+                                    .astype(str)
                                 )
                                 for sentiment in sentiments
                             }
@@ -548,3 +550,4 @@ elif menu == 'Product ID Prediction':
                         )
             except Exception as e:
                 st.error(f"Lỗi khi xử lý tệp: {e}")
+    

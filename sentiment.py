@@ -455,40 +455,40 @@ elif menu == 'Product ID Prediction':
             else:
                 st.warning("Vui lòng nhập mã sản phẩm hợp lệ!")
 
-        elif choice == "Tải lên tập CSV":
-            st.subheader("Tải lên tệp CSV")
-    
-            # File uploader
-            uploaded_file = st.file_uploader("Chọn tệp CSV có cột 'product_id'", type=["csv"])
-    
-            if uploaded_file is None:
-                st.info("Vui lòng tải lên tệp CSV để bắt đầu phân tích.")
-            else:
-                try:
-                    # Đọc file CSV
-                    data = pd.read_csv(uploaded_file)
-    
-                    # Kiểm tra cột 'product_id' có tồn tại
-                    if "product_id" not in data.columns:
-                        st.error("Tệp CSV phải chứa cột 'product_id'.")
-                    else:
-                        # Xử lý giá trị trong cột 'product_id'
-                        data["product_id"] = pd.to_numeric(data["product_id"], errors="coerce")  # Chuyển đổi các giá trị hợp lệ
-                        data = data.dropna(subset=["product_id"])  # Loại bỏ các hàng có giá trị NaN
-                        data["product_id"] = data["product_id"].astype(int)  # Chuyển đổi thành số nguyên
-                        
-                        # Lấy danh sách product_id duy nhất
-                        product_ids = data["product_id"].unique()
-                        st.write(f"Tìm thấy {len(product_ids)} mã sản phẩm:")
-                        st.write(product_ids)
-    
-                        # Phân tích từng product ID
-                        for product_id in product_ids:
-                            st.subheader(f"Phân tích cho mã sản phẩm: {product_id}")
-                            product_reviews = valid_reviews[valid_reviews['ma_san_pham'] == product_id]
-                            if not product_reviews.empty:
-                                st.dataframe(product_reviews.head())
-                            else:
-                                st.warning(f"Không tìm thấy đánh giá cho mã sản phẩm: {product_id}")
-                except Exception as e:
-                    st.error(f"Lỗi khi xử lý tệp: {e}")
+    elif choice == "Tải lên tập CSV":
+        st.subheader("Tải lên tệp CSV")
+
+        # File uploader
+        uploaded_file = st.file_uploader("Chọn tệp CSV có cột 'product_id'", type=["csv"])
+
+        if uploaded_file is None:
+            st.info("Vui lòng tải lên tệp CSV để bắt đầu phân tích.")
+        else:
+            try:
+                # Đọc file CSV
+                data = pd.read_csv(uploaded_file)
+
+                # Kiểm tra cột 'product_id' có tồn tại
+                if "product_id" not in data.columns:
+                    st.error("Tệp CSV phải chứa cột 'product_id'.")
+                else:
+                    # Xử lý giá trị trong cột 'product_id'
+                    data["product_id"] = pd.to_numeric(data["product_id"], errors="coerce")  # Chuyển đổi các giá trị hợp lệ
+                    data = data.dropna(subset=["product_id"])  # Loại bỏ các hàng có giá trị NaN
+                    data["product_id"] = data["product_id"].astype(int)  # Chuyển đổi thành số nguyên
+                    
+                    # Lấy danh sách product_id duy nhất
+                    product_ids = data["product_id"].unique()
+                    st.write(f"Tìm thấy {len(product_ids)} mã sản phẩm:")
+                    st.write(product_ids)
+
+                    # Phân tích từng product ID
+                    for product_id in product_ids:
+                        st.subheader(f"Phân tích cho mã sản phẩm: {product_id}")
+                        product_reviews = valid_reviews[valid_reviews['ma_san_pham'] == product_id]
+                        if not product_reviews.empty:
+                            st.dataframe(product_reviews.head())
+                        else:
+                            st.warning(f"Không tìm thấy đánh giá cho mã sản phẩm: {product_id}")
+            except Exception as e:
+                st.error(f"Lỗi khi xử lý tệp: {e}")

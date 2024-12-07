@@ -254,8 +254,8 @@ def predict_sentiment(text, model, vectorizer):
 # Part 3: Build App
 #----------------------------------------------------------------------------------------------------
 # GUI
-st.title("Data Science Project - Sentiment Analysis for Customer Reviews")
-st.write("## Sử dụng phản hồi từ khách hàng để cải thiện chất lượng sản phẩm và dịch vụ.")
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>🌟 Ứng Dụng Phân Tích Cảm Xúc 🌟</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center;'>Phân tích đánh giá khách hàng để cải thiện sản phẩm</h3>", unsafe_allow_html=True)
 
 menu = st.sidebar.selectbox('Menu', ['Overview', 'Model Evaluation', 'Dự đoán từ văn bản', 'Product ID Prediction'])
 st.sidebar.write("""#### Thành viên thực hiện:

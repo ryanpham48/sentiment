@@ -12,7 +12,48 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import seaborn as sns
 import io
-
+#----------------------------------------------------------------------------------------------------
+# Custom CSS and Styling
+#----------------------------------------------------------------------------------------------------
+st.markdown("""
+    <style>
+    body {
+        background-color: #F7F8FA;
+        font-family: 'Roboto', sans-serif;
+    }
+    .stApp {
+        background-color: #FFFFFF;
+        border-radius: 15px;
+        padding: 10px;
+    }
+    .css-1aumxhk {  /* Sidebar */
+        background-color: #E8F5E9;
+        font-family: 'Georgia', serif;
+    }
+    h1, h2, h3 {
+        color: #4CAF50;
+        font-weight: bold;
+    }
+    .stDownloadButton {
+        font-size: 18px;
+        font-weight: bold;
+        background-color: #4CAF50;
+        color: white;
+    }
+    .st-bar-chart {
+        background-color: #E3F2FD;
+    }
+    .stButton > button {
+        font-size: 16px;
+        font-weight: bold;
+        color: white;
+        background-color: #4CAF50;
+        border-radius: 10px;
+        border: none;
+        padding: 10px 20px;
+    }
+    </style>
+""", unsafe_allow_html=True)
 #----------------------------------------------------------------------------------------------------
 # Part 1: Load Data and Models
 #----------------------------------------------------------------------------------------------------
